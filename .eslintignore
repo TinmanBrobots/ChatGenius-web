@@ -1,0 +1,15 @@
+# Build output
+.next/
+dist/
+build/
+
+# Dependencies
+node_modules/
+
+# Config files
+*.config.js
+*.config.mjs
+next-env.d.ts
+
+# Cache
+.eslintcache 
