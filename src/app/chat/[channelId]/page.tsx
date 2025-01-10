@@ -1,14 +1,14 @@
+import { Metadata } from 'next';
 import ProtectedLayout from '@/components/layouts/ProtectedLayout';
 import { ChatArea } from '@/components/ChatArea';
 import { Sidebar } from '@/components/Sidebar';
 
-interface ChatChannelPageProps {
-  params: {
-    channelId: string;
-  };
+type Props = {
+  params: { channelId: string }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export default function ChatChannelPage({ params }: ChatChannelPageProps) {
+export default function ChatChannelPage({ params }: Props) {
   return (
     <ProtectedLayout>
       <div className="flex h-screen">
