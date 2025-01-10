@@ -128,7 +128,7 @@ export function DirectMessageList() {
         <h2 className="text-lg font-semibold">Direct Messages</h2>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button variant="ghost" size="icon">
+            <Button variant="outline" size="icon" className="px-2">
               <MessageSquare className="h-4 w-4" />
             </Button>
           </DialogTrigger>

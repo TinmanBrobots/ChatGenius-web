@@ -114,15 +114,21 @@ export interface MessageMap {
   children: Map<string, MessageMap>;
 } 
 
-export interface Attachment {
+export interface File {
   id: string;
-  message_id: string;
-  file_name: string;
-  file_type: string;
-  file_size: number;
-  file_url: string;
-  created_at: string;
-}
+  channel_id: string;
+  uploader_id: string;
+  name: string;
+  size: number;
+  mime_type: string;
+  storage_path: string;
+  created_at: Date;
+  updated_at: Date;
+  deleted_at: Date | null;
+  metadata: Record<string, any>;
+  // Joined data
+  uploader?: Profile;
+} 
 
 // Auth related types
 export interface LoginCredentials {

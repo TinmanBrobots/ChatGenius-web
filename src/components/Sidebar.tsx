@@ -7,6 +7,7 @@ import { DirectMessageList } from "@/components/DirectMessageList"
 import { Button } from "@/components/ui/button"
 import { useAuth } from '@/hooks/useAuth'
 import { ChannelCreationForm } from "@/components/ChannelCreationForm"
+import { SearchDialog } from "@/components/SearchDialog"
 import { useState } from 'react'
 import { AvatarWithStatus } from "@/components/ui/avatar-with-status"
 import {
@@ -17,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Settings, LogOut } from 'lucide-react'
+import { Settings, LogOut, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 export function Sidebar() {
@@ -33,21 +34,25 @@ export function Sidebar() {
   
   return (
     <div className="w-64 border-r bg-muted/50 flex flex-col h-screen">
-      <div className="p-4 font-semibold">
-        <span>ChatGenius</span>
+      <div className="p-4 flex items-center justify-between">
+        <span className="font-semibold text-lg">ChatGenius</span>
+        <SearchDialog />
       </div>
       <Separator />
       <ScrollArea className="flex-1">
         <div className="p-4">
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-lg font-semibold">Channels</h2>
-            <Button variant="ghost" size="sm" onClick={() => setShowChannelForm(true)}>+</Button>
+            <Button variant="outline" size="sm" className="px-2" onClick={() => setShowChannelForm(true)}>
+              <Plus className="h-4 w-4" />
+            </Button>
           </div>
           {showChannelForm && (
             <ChannelCreationForm 
               onClose={() => setShowChannelForm(false)} 
             />
           )}
+          {showChannelForm && <Separator className="my-4" />}
           <ChannelList />
           <Separator className="my-4" />
           <DirectMessageList />
