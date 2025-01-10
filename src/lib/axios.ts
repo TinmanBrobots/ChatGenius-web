@@ -1,8 +1,11 @@
 import axios from 'axios';
 import { toast } from '@/components/ui/use-toast';
 
+// Remove /api from NEXT_PUBLIC_API_URL if it exists
+const baseURL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001').replace(/\/+$/, '');
+
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api',
+  baseURL: `${baseURL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
