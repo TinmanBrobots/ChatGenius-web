@@ -3,6 +3,11 @@ import ProtectedLayout from '@/components/layouts/ProtectedLayout';
 import { ChatArea } from '@/components/ChatArea';
 import { Sidebar } from '@/components/Sidebar';
 
+export const metadata: Metadata = {
+  title: 'Chat | ChatGenius',
+  description: 'Chat with your friends and colleagues',
+};
+
 type Props = {
   params: { channelId: string }
   searchParams: { [key: string]: string | string[] | undefined }
