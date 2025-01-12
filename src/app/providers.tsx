@@ -10,7 +10,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
+      {/* <AuthProvider> */}
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -19,7 +19,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         >
           {children}
         </ThemeProvider>
-      </AuthProvider>
+      {/* </AuthProvider> */}
     </QueryClientProvider>
   );
 } 

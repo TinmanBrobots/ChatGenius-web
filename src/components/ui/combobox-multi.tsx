@@ -115,6 +115,10 @@ export function ComboboxMulti({
           >
             {value.length === 0 ? (
               <span className="text-muted-foreground">{placeholder}</span>
+            ) : maxSelected === 1 ? (
+              <span className="truncate">
+                {selectedLabels[value[0]]}
+              </span>
             ) : (
               <span className="truncate">
                 {value.length} selected
@@ -123,7 +127,7 @@ export function ComboboxMulti({
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0" align="start">
+        <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
           <Command shouldFilter={false}>
             <CommandInput 
               placeholder="Search..." 
@@ -131,48 +135,48 @@ export function ComboboxMulti({
               onValueChange={setQuery}
             />
             <CommandList>
-              {loading && (
-                <div className="flex items-center gap-2">
+              {loading ? (
+                <div className="flex items-center justify-center gap-2 p-4">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span>{loadingText}</span>
                 </div>
-              )}
-              {!loading && options.length === 0 && query && (
+              ) : options.length === 0 && query ? (
                 <CommandEmpty>{emptyText}</CommandEmpty>
+              ) : (
+                <CommandGroup>
+                  {options.map((option) => (
+                    <CommandItem
+                      key={option.value}
+                      value={option.value}
+                      onSelect={() => handleSelect(option.value, option.label)}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          value.includes(option.value) ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      <div className="flex flex-col">
+                        <span>{option.label}</span>
+                        {option.description && (
+                          <span className="text-xs text-muted-foreground">
+                            {option.description}
+                          </span>
+                        )}
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
               )}
-              <CommandGroup>
-                {options.map((option) => (
-                  <CommandItem
-                    key={option.value}
-                    value={option.value}
-                    onSelect={() => handleSelect(option.value, option.label)}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        value.includes(option.value) ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    <div className="flex flex-col">
-                      <span>{option.label}</span>
-                      {option.description && (
-                        <span className="text-xs text-muted-foreground">
-                          {option.description}
-                        </span>
-                      )}
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
             </CommandList>
           </Command>
         </PopoverContent>
       </Popover>
 
-      {value.length > 0 && (
+      {maxSelected !== 1 && value.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {value.map((v) => (
-            <Badge key={v} variant="secondary">
+            <Badge key={v} variant="outline">
               {selectedLabels[v]}
               <button
                 className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"

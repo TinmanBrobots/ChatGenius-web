@@ -62,6 +62,12 @@ export function ChatArea({ channelId }: ChatAreaProps) {
     return currentMember?.role;
   }
 
+  const getLastReadAt = () => {
+    if (!members.data || !currentUser) return undefined;
+    const currentMember = members.data.find(member => member.profile_id === currentUser.id);
+    return currentMember?.last_read_at;
+  }
+
   if (channel.isError || !channel.data) {
     return (
       <div className="flex items-center justify-center h-full text-muted-foreground">
@@ -83,6 +89,7 @@ export function ChatArea({ channelId }: ChatAreaProps) {
         onReply={setReplyingTo}
         shouldAutoScroll={shouldAutoScroll}
         onScroll={handleScroll}
+        lastReadAt={getLastReadAt()}
       />
       <MessageInput 
         channelId={channelId}

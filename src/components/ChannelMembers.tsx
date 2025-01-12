@@ -26,6 +26,7 @@ import {
 import { ComboboxMulti } from "@/components/ui/combobox-multi"
 import { toast } from "@/components/ui/use-toast"
 import { useAuth } from '@/hooks/useAuth'
+import { ChannelMember } from '@/types'
 
 interface ChannelMembersProps {
   channelId: string
@@ -61,6 +62,21 @@ export function ChannelMembers({ channelId }: ChannelMembersProps) {
   const isAdmin = members.data?.some(
     member => member.profile_id === currentUser?.id && ['admin', 'owner'].includes(member.role)
   )
+
+  const sortMembers = (members?: ChannelMember[]) => {
+    if (!members) return []
+    return members.sort((a, b) => {
+      if (a.role === b.role) {
+        const aName = a.profile?.full_name || a.profile?.username || ''
+        const bName = b.profile?.full_name || b.profile?.username || ''
+        return aName.localeCompare(bName)
+      }
+
+      const aRoleValue = ['member', 'admin', 'owner'].indexOf(a.role)
+      const bRoleValue = ['member', 'admin', 'owner'].indexOf(b.role)
+      return aRoleValue - bRoleValue
+    })
+  }
 
   const handleSearch = async (query: string) => {
     if (!query) return []
@@ -217,7 +233,7 @@ export function ChannelMembers({ channelId }: ChannelMembersProps) {
       
       <ScrollArea className="h-[400px] pr-4">
         <div className="space-y-4">
-          {members.data?.map((member) => (
+          {sortMembers(members.data).map((member) => (
             <div key={member.profile_id} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <AvatarWithStatus

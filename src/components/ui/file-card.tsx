@@ -62,20 +62,24 @@ export function FileCard({ file, canDelete, onDelete }: FileCardProps) {
   return (
     <Card className="w-full">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-medium flex items-center gap-2">
-          <FileIcon className="h-4 w-4" />
-          {file.name}
+        <CardTitle className="text-base font-medium">
+          <div className="flex">
+            <FileIcon className="h-4 w-4 shrink-0 mt-1 mr-2" />
+            <span className="break-words max-w-[270px]">
+              {file.name}
+            </span>
+          </div>
         </CardTitle>
         <CardDescription className="text-sm">
-          {formatFileSize(file.size)} • Uploaded by {file.uploader?.username || 'Unknown'}
+          {formatFileSize(file.size)} • Uploaded by {file.uploader?.full_name || 'Unknown'}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="text-sm text-muted-foreground">
-          {new Date(file.created_at).toLocaleDateString()}
+          {new Date(file.created_at).toLocaleString()}
         </div>
       </CardContent>
-      <CardFooter className="flex justify-end gap-2 grid grid-rows-2">
+      <CardFooter className="flex justify-end gap-2">
         <Button
           variant="outline"
           size="sm"
@@ -87,7 +91,7 @@ export function FileCard({ file, canDelete, onDelete }: FileCardProps) {
           ) : (
             <Download className="h-4 w-4" />
           )}
-          <span className="ml-2">Download</span>
+          {/* <span className="ml-2">Download</span> */}
         </Button>
         {canDelete && (
           <Button
@@ -101,7 +105,7 @@ export function FileCard({ file, canDelete, onDelete }: FileCardProps) {
             ) : (
               <Trash2 className="h-4 w-4" />
             )}
-            <span className="ml-2">Delete</span>
+            {/* <span className="ml-2">Delete</span> */}
           </Button>
         )}
       </CardFooter>

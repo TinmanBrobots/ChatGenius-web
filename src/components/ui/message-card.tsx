@@ -3,13 +3,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { MessageSquare, ChevronDown, ChevronRight } from 'lucide-react'
-import { MessageMap } from '@/types'
+import { Message, MessageMap } from '@/types'
 import { MessageReactions } from '@/components/MessageReactions'
 
 interface MessageCardProps {
   messageMap: MessageMap;
   onReply: (messageId: string) => void;
   depth?: number;
+  highlighted?: boolean;
+  isUnread: (message: Message) => boolean;
 }
 
 const threadColors = [
@@ -20,7 +22,7 @@ const threadColors = [
   'border-orange-500'
 ];
 
-export function MessageCard({ messageMap, onReply, depth = 0 }: MessageCardProps) {
+export function MessageCard({ messageMap, onReply, depth = 0, highlighted, isUnread }: MessageCardProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const hasReplies = messageMap.children.size > 0;
   const message = messageMap.message;
@@ -36,7 +38,7 @@ export function MessageCard({ messageMap, onReply, depth = 0 }: MessageCardProps
               style={{ marginLeft: index > 0 ? '32px' : '0' }}
             />
           ))}
-          <Card className="w-full">
+          <Card className={`w-full ${highlighted ? 'bg-yellow-100/50 rounded-lg transition-colors duration-300' : ''} ${isUnread(message) ? 'bg-blue-100/50 rounded-lg transition-colors duration-300' : ''}`}>
             <CardContent className="p-4">
               <div className="flex items-start space-x-4">
                 <Avatar>
@@ -45,9 +47,9 @@ export function MessageCard({ messageMap, onReply, depth = 0 }: MessageCardProps
                 </Avatar>
                 <div className="flex-1">
                   <div className="flex items-center space-x-2">
-                    <span className="font-semibold">{message.sender?.username || ''}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(message.created_at).toLocaleString()}
+                    <span className="font-semibold">{message.sender?.full_name || ''}</span>
+                    <span className="text-sm text-muted-foreground">
+                      @{message.sender?.username || ''} • {new Date(message.created_at).toLocaleString()}
                     </span>
                     {message.is_edited && (
                       <span className="text-xs text-muted-foreground">(edited)</span>
@@ -101,6 +103,7 @@ export function MessageCard({ messageMap, onReply, depth = 0 }: MessageCardProps
               messageMap={childMap} 
               onReply={onReply} 
               depth={depth + 1} 
+              isUnread={isUnread}
             />
           ))}
         </div>

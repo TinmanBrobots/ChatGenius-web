@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { File } from '@/types';
+import { ChannelMember, File } from '@/types';
 import { useFiles } from '@/hooks/useFiles';
 import { useAuth } from '@/hooks/useAuth';
 import { FileCard } from './file-card';
@@ -8,10 +8,12 @@ import { Loader2 } from 'lucide-react';
 
 interface FileListProps {
   channelId: string;
-  currentUserRole?: string;
+  currentUserRole?: ChannelMember['role'];
+  shouldRefresh: boolean;
+  onRefresh: () => void;
 }
 
-export function FileList({ channelId, currentUserRole }: FileListProps) {
+export function FileList({ channelId, currentUserRole, shouldRefresh, onRefresh }: FileListProps) {
   const { getChannelFiles } = useFiles();
   const { currentUser: user } = useAuth();
   const [files, setFiles] = useState<File[]>([]);
@@ -39,10 +41,11 @@ export function FileList({ channelId, currentUserRole }: FileListProps) {
 
   useEffect(() => {
     loadFiles(1);
-  }, [channelId]);
+  }, [channelId, shouldRefresh]);
 
   const handleDelete = () => {
     loadFiles(page);
+    onRefresh?.();
   };
 
   const canDelete = (file: File) => {
@@ -71,7 +74,7 @@ export function FileList({ channelId, currentUserRole }: FileListProps) {
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4">
         {files.map((file) => (
           <FileCard
             key={file.id}

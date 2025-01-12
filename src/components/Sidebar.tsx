@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Settings, LogOut, Plus } from 'lucide-react'
+import { Settings, LogOut, Plus, FileIcon, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 export function Sidebar() {
@@ -43,8 +43,8 @@ export function Sidebar() {
         <div className="p-4">
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-lg font-semibold">Channels</h2>
-            <Button variant="outline" size="sm" className="px-2" onClick={() => setShowChannelForm(true)}>
-              <Plus className="h-4 w-4" />
+            <Button variant="outline" size="sm" className="px-2" onClick={() => setShowChannelForm(!showChannelForm)}>
+              {showChannelForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
             </Button>
           </div>
           {showChannelForm && (
@@ -85,6 +85,10 @@ export function Sidebar() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => router.push('/files')}>
+              <FileIcon className="mr-2 h-4 w-4" />
+              <span>Files</span>
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={handleSettingsClick}>
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>

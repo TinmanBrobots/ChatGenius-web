@@ -69,7 +69,7 @@ export function FileUploadDialog({ channelId, onUploadComplete }: FileUploadDial
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <Button variant="outline" size="icon">
           <Plus className="h-4 w-4" />
         </Button>
       </DialogTrigger>

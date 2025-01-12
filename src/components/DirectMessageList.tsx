@@ -61,8 +61,8 @@ export function DirectMessageList() {
       
       return availableProfiles.map(profile => ({
         value: profile.id,
-        label: profile.username,
-        description: profile.full_name || undefined
+        label: profile.full_name || profile.username,
+        description: profile.full_name ? profile.username : undefined
       }))
     } catch (error) {
       console.error('Failed to search profiles:', error)

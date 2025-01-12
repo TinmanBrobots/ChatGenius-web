@@ -31,8 +31,8 @@ export function SearchDialog() {
     enabled: searchQuery.length > 0,
   });
 
-  const handleMessageClick = (channelId: string) => {
-    router.push(`/chat/${channelId}`);
+  const handleMessageClick = (channelId: string, messageId: string) => {
+    router.push(`/chat/${channelId}?highlight=${messageId}`);
     setIsOpen(false);
   };
 
@@ -73,7 +73,7 @@ export function SearchDialog() {
                   <button
                     key={message.id}
                     className="w-full p-4 text-left hover:bg-muted rounded-lg transition-colors"
-                    onClick={() => handleMessageClick(message.channel_id)}
+                    onClick={() => handleMessageClick(message.channel_id, message.id)}
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">

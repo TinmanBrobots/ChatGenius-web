@@ -51,7 +51,7 @@ export interface Channel {
   };
   metadata: Record<string, unknown>;
   // Joined data
-  members?: {
+  members?: (ChannelMember & {
     profile_id: string;
     profile: {
       id: string;
@@ -61,7 +61,7 @@ export interface Channel {
       status: 'online' | 'offline' | 'away' | 'busy';
       last_seen_at: string;
     };
-  }[];
+  })[];
 }
 
 export interface ChannelMember {

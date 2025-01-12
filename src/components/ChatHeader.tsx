@@ -3,15 +3,19 @@ import { Users, FileBox } from 'lucide-react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { ChannelMembers } from "@/components/ChannelMembers"
 import { FileList } from "@/components/ui/file-list"
-import { Channel, Profile } from "@/types"
+import { Channel, ChannelMember, Profile } from "@/types"
+import { FileUploadDialog } from "./ui/file-upload-dialog"
+import { useState } from "react"
 
 interface ChatHeaderProps {
   channel: Channel;
   otherUser?: Profile | null;
-  currentUserRole?: string;
+  currentUserRole?: ChannelMember['role'];
 }
 
 export function ChatHeader({ channel, otherUser, currentUserRole }: ChatHeaderProps) {
+  const [fileListShouldRefresh, setFileListShouldRefresh] = useState(false);
+
   return (
     <div className="border-b p-4">
       <div className="flex items-center justify-between">
@@ -36,10 +40,21 @@ export function ChatHeader({ channel, otherUser, currentUserRole }: ChatHeaderPr
             </SheetTrigger>
             <SheetContent>
               <SheetHeader>
-                <SheetTitle>Channel Files</SheetTitle>
+                <SheetTitle className="flex gap-4 items-center">
+									Channel Files
+									<FileUploadDialog
+										channelId={channel.id}
+										onUploadComplete={() => setFileListShouldRefresh(true)}
+									/>
+								</SheetTitle>
               </SheetHeader>
               <div className="mt-4">
-                <FileList channelId={channel.id} currentUserRole={currentUserRole} />
+                <FileList 
+                  channelId={channel.id} 
+                  currentUserRole={currentUserRole} 
+                  shouldRefresh={fileListShouldRefresh} 
+                  onRefresh={() => setFileListShouldRefresh(false)}
+                />
               </div>
             </SheetContent>
           </Sheet>
