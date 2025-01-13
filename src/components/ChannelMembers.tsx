@@ -265,9 +265,9 @@ export function ChannelMembers({ channelId }: ChannelMembersProps) {
                     <DropdownMenuItem onClick={() => handleRoleChange(member.profile_id, 'admin')}>
                       Make Admin
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleRoleChange(member.profile_id, 'moderator')}>
+                    {/* <DropdownMenuItem onClick={() => handleRoleChange(member.profile_id, 'moderator')}>
                       Make Moderator
-                    </DropdownMenuItem>
+                    </DropdownMenuItem> */}
                     <DropdownMenuItem onClick={() => handleRoleChange(member.profile_id, 'member')}>
                       Remove Role
                     </DropdownMenuItem>

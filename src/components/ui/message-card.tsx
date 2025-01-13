@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { MessageSquare, ChevronDown, ChevronRight } from 'lucide-react'
 import { Message, MessageMap } from '@/types'
 import { MessageReactions } from '@/components/MessageReactions'
+import { AvatarWithStatus } from './avatar-with-status'
 
 interface MessageCardProps {
   messageMap: MessageMap;
@@ -41,10 +42,12 @@ export function MessageCard({ messageMap, onReply, depth = 0, highlighted, isUnr
           <Card className={`w-full ${highlighted ? 'bg-yellow-100/50 rounded-lg transition-colors duration-300' : ''} ${isUnread(message) ? 'bg-blue-100/50 rounded-lg transition-colors duration-300' : ''}`}>
             <CardContent className="p-4">
               <div className="flex items-start space-x-4">
-                <Avatar>
-                  <AvatarImage src={message.sender?.avatar_url || undefined} alt={message.sender?.username || ''} />
-                  <AvatarFallback>{message.sender?.username?.charAt(0).toUpperCase() || ''}</AvatarFallback>
-                </Avatar>
+                <AvatarWithStatus
+                  src={message.sender?.avatar_url || undefined}
+                  fallback={message.sender?.username?.charAt(0).toUpperCase() || ''}
+                  status={message.sender?.status || 'online'}
+                  lastSeen={message.sender?.last_seen_at || ''}
+                />
                 <div className="flex-1">
                   <div className="flex items-center space-x-2">
                     <span className="font-semibold">{message.sender?.full_name || ''}</span>
