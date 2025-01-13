@@ -166,7 +166,7 @@ export function DirectMessageList() {
       <div className="space-y-1">
         {channels.data?.filter(channel => channel.type === 'direct').map((channel) => {
           const otherUser = channel.members?.find(member => member.profile_id !== currentUser?.id)?.profile;
-          
+          console.log("otherUser", otherUser)
           return (
             <Link 
               key={channel.id} 

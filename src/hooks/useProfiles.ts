@@ -12,8 +12,8 @@ interface UpdateProfileData {
 }
 
 interface UpdateStatusData {
-  status: string;
-  expires_at?: string;
+  status: 'online' | 'offline' | 'away' | 'busy';
+  customStatus?: string;
 }
 
 interface NotificationPreferences {
@@ -27,25 +27,66 @@ interface ThemePreferences {
   custom_colors?: Record<string, string>;
 }
 
+interface PresenceData {
+  status: 'online' | 'offline' | 'away' | 'busy';
+  lastSeen: string;
+  customStatus?: string;
+}
+
 export function useProfiles() {
   const queryClient = useQueryClient();
 
   // Socket event handlers for real-time status updates
   useEffect(() => {
-    function handleStatusUpdate({ profileId, status, lastSeen }: { profileId: string; status: string; lastSeen?: string }) {
+    function handleStatusUpdate({ profileId, status, lastSeen, customStatus }: { 
+      profileId: string; 
+      status: string; 
+      lastSeen?: string;
+      customStatus?: string;
+    }) {
       queryClient.setQueryData(['profile', profileId], (oldData: Profile | undefined) => {
         if (!oldData) return oldData;
         return {
           ...oldData,
           status,
-          last_seen_at: lastSeen || oldData.last_seen_at
+          last_seen_at: lastSeen || oldData.last_seen_at,
+          custom_status: customStatus
         };
       });
+
+      // Also update profile in any lists or cached queries
+      queryClient.setQueriesData(
+        { queryKey: ['profiles'] },
+        (oldData: any) => {
+          if (!oldData?.pages) return oldData;
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: any) => ({
+              ...page,
+              profiles: page.profiles.map((profile: Profile) =>
+                profile.id === profileId
+                  ? {
+                      ...profile,
+                      status,
+                      last_seen_at: lastSeen || profile.last_seen_at,
+                      custom_status: customStatus
+                    }
+                  : profile
+              ),
+            })),
+          };
+        }
+      );
     }
 
-    function handlePresenceSync(presenceData: { [key: string]: { status: string; lastSeen?: string } }) {
+    function handlePresenceSync(presenceData: Record<string, PresenceData>) {
       Object.entries(presenceData).forEach(([profileId, data]) => {
-        handleStatusUpdate({ profileId, ...data });
+        handleStatusUpdate({ 
+          profileId, 
+          status: data.status,
+          lastSeen: data.lastSeen,
+          customStatus: data.customStatus
+        });
       });
     }
 
@@ -105,7 +146,10 @@ export function useProfiles() {
     mutationFn: async ({ id, data }: { id: string; data: UpdateStatusData }) => {
       const response = await api.put<Profile>(`/profiles/${id}/status`, data);
       // Emit status update through socket
-      socket.emit('status_change', { status: data.status });
+      socket.emit('status_change', { 
+        status: data.status,
+        customStatus: data.customStatus
+      });
       return response.data;
     },
     onSuccess: () => {

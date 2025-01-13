@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { LoginCredentials, RegisterCredentials, Profile } from '@/types';
 import api from '@/lib/axios';
-import { socket } from '@/lib/socket';
+import { socket, updateSocketAuth } from '@/lib/socket';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -16,9 +16,10 @@ interface AuthResponse {
 // Initialize auth state from localStorage
 const initializeAuthState = () => {
   const token = localStorage.getItem('token');
-  if (token) {
+  const userId = localStorage.getItem('userId');
+  if (token && userId) {
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    socket.auth = { token };
+    updateSocketAuth(token, userId);
   }
   return !!token;
 };
@@ -38,29 +39,30 @@ export function useAuth() {
   }, []);
 
   const setupAuth = (token: string, user: Profile) => {
-    // Store the token
+    // Store the token and user ID
     localStorage.setItem('token', token);
+    localStorage.setItem('userId', user.id);
     
     // Update axios default headers
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     
-    // Connect socket with auth token
-    socket.auth = { token };
-    socket.connect();
+    // Update socket auth and connect
+    updateSocketAuth(token, user.id);
 
     // Update user in React Query cache
     queryClient.setQueryData(['currentUser'], user);
   };
 
   const cleanupAuth = () => {
-    // Clear token
+    // Clear stored data
     localStorage.removeItem('token');
+    localStorage.removeItem('userId');
     
     // Remove auth header
     delete api.defaults.headers.common['Authorization'];
     
-    // Disconnect socket
-    socket.disconnect();
+    // Disconnect and cleanup socket
+    updateSocketAuth(null, null);
     
     // Clear all queries from cache
     queryClient.clear();
@@ -112,7 +114,9 @@ export function useAuth() {
     if (!isInitialized) return null;
     
     const token = localStorage.getItem('token');
-    if (!token) {
+    const userId = localStorage.getItem('userId');
+    
+    if (!token || !userId) {
       return null;
     }
 
