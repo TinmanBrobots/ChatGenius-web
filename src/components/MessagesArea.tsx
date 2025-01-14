@@ -5,6 +5,7 @@ import { MessageMap } from "@/types"
 import { useRef, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import _ from 'lodash';
 
 interface MessagesAreaProps {
   messages: MessageMap[] | undefined;
