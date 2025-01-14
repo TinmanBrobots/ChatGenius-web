@@ -31,26 +31,8 @@ export function ChannelList() {
     );
   }
 
-  if (channels.isError) {
-    return (
-      <Alert variant="destructive" className="my-4">
-        <AlertDescription>
-          Failed to load channels. Please try again later.
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
-  if (!channels.data || channels.data.length === 0) {
-    return (
-      <div className="text-sm text-muted-foreground py-2">
-        No channels available
-      </div>
-    );
-  }
-
   // Sort channels: public first, then private, alphabetically within each group
-  const sortedChannels = [...channels.data]
+  const sortedChannels = [...(channels.data || [])]
     .filter(channel => channel.type !== 'direct')
     .sort((a, b) => {
       if (a.type === b.type) {
@@ -108,6 +90,11 @@ export function ChannelList() {
       {showChannelForm && <Separator className="my-4" />}
       <div className="space-y-2">
         <ul className="space-y-1">
+          {channels.isLoading && (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="h-4 w-4 animate-spin" />
+            </div>
+          )}
           {sortedChannels.map((channel: Channel) => {
             const isMember = channel.members?.some(member => member.profile_id === currentUser?.id);
             return (
