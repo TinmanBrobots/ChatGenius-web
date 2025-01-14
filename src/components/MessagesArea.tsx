@@ -174,7 +174,7 @@ export function MessagesArea({
         </div>
       )}
 			<div className="space-y-4">
-				{messages?.map((messageMap) => (
+				{_.uniqBy(messages, 'message.id')?.map((messageMap) => (
 					<div
 						key={messageMap.message.id}
 						id={`message-${messageMap.message.id}`}

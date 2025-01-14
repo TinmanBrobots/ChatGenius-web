@@ -85,9 +85,7 @@ export function useMessages(channelId: string) {
           // If it's a reply, add it to the parent's children
           if (message.parent_id && oldData.messageMap.has(message.parent_id)) {
             const parentMap = oldData.messageMap.get(message.parent_id)!;
-            if (!parentMap.children.has(message.id)) {
-              parentMap.children.set(message.id, newMessageMap);
-            }
+            parentMap.children.set(message.id, newMessageMap);
             
             return {
               ...oldData,
