@@ -43,10 +43,7 @@ export function MessageCard({ messageMap, onReply, depth = 0, highlighted, isUnr
             <CardContent className="p-4">
               <div className="flex items-start space-x-4">
                 <AvatarWithStatus
-                  src={message.sender?.avatar_url || undefined}
-                  fallback={message.sender?.username?.charAt(0).toUpperCase() || ''}
-                  status={message.sender?.status || 'online'}
-                  lastSeen={message.sender?.last_seen_at || ''}
+                  profileId={message.sender?.id || ''}
                 />
                 <div className="flex-1">
                   <div className="flex items-center space-x-2">
@@ -89,7 +86,7 @@ export function MessageCard({ messageMap, onReply, depth = 0, highlighted, isUnr
                         <MessageSquare className="h-4 w-4 mr-1" />
                         Reply
                       </Button>
-                      <MessageReactions messageId={message.id} reactions={message.reactions || []} />
+                      <MessageReactions messageId={message.id} reactions={message.reactions || []} channelId={message.channel_id} />
                     </div>
                   </div>
                 </div>

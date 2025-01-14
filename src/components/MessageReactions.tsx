@@ -7,43 +7,29 @@ import api from '@/lib/axios';
 import { useAuthContext } from '@/providers/AuthProvider';
 import { MessageReaction } from '@/types';
 import { EmojiPicker } from '@/components/ui/emoji-picker';
+import { useMessages } from '@/hooks/useMessages';
+import _ from 'lodash';
 
 interface MessageReactionsProps {
   messageId: string;
   reactions: MessageReaction[];
+  channelId: string;
 }
 
-export function MessageReactions({ messageId, reactions }: MessageReactionsProps) {
-  const queryClient = useQueryClient();
+export function MessageReactions({ messageId, reactions, channelId }: MessageReactionsProps) {
   const { user } = useAuthContext();
+  const { addReaction, removeReaction } = useMessages(channelId);
 
-  // Group reactions by emoji
+  // Group reactions by emoji, unique by profile_id
   const reactionGroups = reactions.reduce((acc: Record<string, MessageReaction[]>, reaction) => {
     if (!acc[reaction.emoji]) {
       acc[reaction.emoji] = [];
     }
-    acc[reaction.emoji].push(reaction);
+    if (!acc[reaction.emoji].some(r => r.profile_id === reaction.profile_id)) {
+      acc[reaction.emoji].push(reaction);
+    }
     return acc;
   }, {});
-
-  const addReaction = useMutation({
-    mutationFn: async (emoji: string) => {
-      const response = await api.post(`/messages/${messageId}/reactions`, { emoji });
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['messages'] });
-    }
-  });
-
-  const removeReaction = useMutation({
-    mutationFn: async (emoji: string) => {
-      await api.delete(`/messages/${messageId}/reactions/${emoji}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['messages'] });
-    }
-  });
 
   const handleEmojiSelect = async (emoji: string) => {
     const hasReacted = reactions.some(
@@ -51,9 +37,9 @@ export function MessageReactions({ messageId, reactions }: MessageReactionsProps
     );
 
     if (hasReacted) {
-      await removeReaction.mutateAsync(emoji);
+      await removeReaction.mutateAsync({ messageId, emoji });
     } else {
-      await addReaction.mutateAsync(emoji);
+      await addReaction.mutateAsync({ messageId, emoji });
     }
   };
 

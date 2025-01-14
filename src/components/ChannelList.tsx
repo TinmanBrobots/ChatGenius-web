@@ -3,13 +3,17 @@
 import { useChannels } from '@/hooks/useChannels';
 import { useAuth } from '@/hooks/useAuth';
 import { Channel } from '@/types';
-import { Hash, Lock, Loader2, Plus } from 'lucide-react'
+import { Hash, Lock, Loader2, Plus, RefreshCw, X } from 'lucide-react'
 import Link from 'next/link'
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { cn } from '@/lib/utils';
 import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/components/ui/use-toast';
+import { Button } from '@/components/ui/button';
+import { ChannelCreationForm } from './ChannelCreationForm';
+import { useState } from 'react';
+import { Separator } from '@radix-ui/react-separator';
 
 export function ChannelList() {
   const { channels, addMember } = useChannels({ types: ['public', 'private'] });
@@ -17,6 +21,7 @@ export function ChannelList() {
   const router = useRouter();
   const params = useParams();
   const currentChannelId = params?.channelId as string;
+  const [showChannelForm, setShowChannelForm] = useState(false)
 
   if (channels.isLoading) {
     return (
@@ -78,10 +83,30 @@ export function ChannelList() {
 
   return (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <div className="text-xs font-semibold text-muted-foreground uppercase px-2">
-          Channels
+      <div className="flex justify-between items-center mb-2">
+        <h2 className="text-lg font-semibold">Channels</h2>
+        <div className="flex items-center gap-2">
+          <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-6 w-6" 
+              onClick={() => channels.refetch()}
+              disabled={channels.isRefetching}
+            >
+            <RefreshCw className={`h-3 w-3 ${channels.isRefetching ? 'animate-spin' : ''}`} />
+          </Button>
+          <Button variant="outline" size="sm" className="px-2" onClick={() => setShowChannelForm(!showChannelForm)}>
+            {showChannelForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+          </Button>
         </div>
+      </div>
+      {showChannelForm && (
+        <ChannelCreationForm 
+          onClose={() => setShowChannelForm(false)} 
+        />
+      )}
+      {showChannelForm && <Separator className="my-4" />}
+      <div className="space-y-2">
         <ul className="space-y-1">
           {sortedChannels.map((channel: Channel) => {
             const isMember = channel.members?.some(member => member.profile_id === currentUser?.id);

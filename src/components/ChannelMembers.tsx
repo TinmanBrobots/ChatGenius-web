@@ -6,7 +6,7 @@ import { useProfiles } from '@/hooks/useProfiles'
 import { AvatarWithStatus } from "@/components/ui/avatar-with-status"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Loader2, MoreVertical, Crown, Shield, UserX, UserPlus, X } from 'lucide-react'
+import { Loader2, MoreVertical, Crown, Shield, UserX, UserPlus, X, RefreshCw } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -190,45 +190,61 @@ export function ChannelMembers({ channelId }: ChannelMembersProps) {
 	console.log(isAdmin)
   return (
     <div className="space-y-4">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold">Channel Members</h2>
+        <Button 
+          variant="outline" 
+          size="icon"
+          onClick={() => {
+            members.refetch();
+            channel.refetch();
+          }}
+          disabled={members.isRefetching || channel.isRefetching}
+        >
+          <RefreshCw className={`h-4 w-4 ${members.isRefetching || channel.isRefetching ? 'animate-spin' : ''}`} />
+        </Button>
+      </div>
       {isAdmin && (
-        <Dialog open={isAddMemberOpen} onOpenChange={setIsAddMemberOpen}>
-          <DialogTrigger asChild>
-            <Button className="w-full">
-              <UserPlus className="h-4 w-4 mr-2" />
-              Add Members
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add Channel Members</DialogTitle>
-              <DialogDescription>
-                Search and select users to add to this channel.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <ComboboxMulti
-                placeholder="Search users..."
-                onSearch={handleSearch}
-                value={selectedMembers}
-                onChange={setSelectedMembers}
-              />
-              <div className="flex justify-end space-x-2">
-                <Button
-                  variant="ghost"
-                  onClick={() => setIsAddMemberOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleAddMembers}
-                  disabled={selectedMembers.length === 0}
-                >
-                  Add Selected Members
-                </Button>
+        <div className="flex items-center gap-2">
+          <Dialog open={isAddMemberOpen} onOpenChange={setIsAddMemberOpen}>
+            <DialogTrigger asChild>
+              <Button className="flex-1">
+                <UserPlus className="h-4 w-4 mr-2" />
+                Add Members
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add Channel Members</DialogTitle>
+                <DialogDescription>
+                  Search and select users to add to this channel.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <ComboboxMulti
+                  placeholder="Search users..."
+                  onSearch={handleSearch}
+                  value={selectedMembers}
+                  onChange={setSelectedMembers}
+                />
+                <div className="flex justify-end space-x-2">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setIsAddMemberOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleAddMembers}
+                    disabled={selectedMembers.length === 0}
+                  >
+                    Add Selected Members
+                  </Button>
+                </div>
               </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       )}
       
       <ScrollArea className="h-[400px] pr-4">
@@ -237,10 +253,8 @@ export function ChannelMembers({ channelId }: ChannelMembersProps) {
             <div key={member.profile_id} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <AvatarWithStatus
-                  src={member.profile?.avatar_url || undefined}
-                  fallback={member.profile?.username?.charAt(0).toUpperCase() || ''}
-                  status={member.profile?.status || 'offline'}
-                  lastSeen={member.profile?.last_seen_at}
+                  profileId={member.profile_id}
+                  className="h-8 w-8"
                 />
                 <div>
                   <div className="flex items-center gap-1">

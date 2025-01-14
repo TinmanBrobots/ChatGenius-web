@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ComboboxMulti } from "@/components/ui/combobox-multi"
 import { useState } from 'react'
-import { Loader2, MessageSquare } from 'lucide-react'
+import { Loader2, MessageSquare, RefreshCw } from 'lucide-react'
 import { toast } from '@/components/ui/use-toast'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -26,17 +26,8 @@ export function DirectMessageList() {
   const searchProfilesQuery = useSearchProfiles(searchQuery)
   const router = useRouter()
   const params = useParams()
-  const currentChannelId = params?.channelId as string
 
   const directChannels = channels.data?.filter(channel => channel.type === 'direct') || []
-
-  // Helper function to get the other member's info from a DM channel
-  const getOtherMember = (channel: Channel) => {
-    if (!channel.members || !currentUser) return null;
-    return channel.members.find(
-      member => member.profile_id !== currentUser.id
-    )?.profile;
-  }
 
   // Find existing DM channel with a user
   const findExistingDMChannel = (userId: string) => {
@@ -126,41 +117,52 @@ export function DirectMessageList() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Direct Messages</h2>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline" size="icon" className="px-2">
-              <MessageSquare className="h-4 w-4" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Start a Direct Message</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <ComboboxMulti
-                placeholder="Search users..."
-                onSearch={handleSearch}
-                value={selectedUser}
-                onChange={setSelectedUser}
-                maxSelected={1}
-              />
-              <div className="flex justify-end space-x-2">
-                <Button
-                  variant="ghost"
-                  onClick={() => setIsDialogOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleStartChat}
-                  disabled={selectedUser.length === 0}
-                >
-                  Start Chat
-                </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-6 w-6"
+            onClick={() => channels.refetch()}
+            disabled={channels.isRefetching}
+          >
+            <RefreshCw className={`h-3 w-3 ${channels.isRefetching ? 'animate-spin' : ''}`} />
+          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="icon" className="px-2">
+                <MessageSquare className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Start a Direct Message</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <ComboboxMulti
+                  placeholder="Search users..."
+                  onSearch={handleSearch}
+                  value={selectedUser}
+                  onChange={setSelectedUser}
+                  maxSelected={1}
+                />
+                <div className="flex justify-end space-x-2">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setIsDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleStartChat}
+                    disabled={selectedUser.length === 0}
+                  >
+                    Start Chat
+                  </Button>
+                </div>
               </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <div className="space-y-1">
@@ -178,10 +180,7 @@ export function DirectMessageList() {
             >
               <AvatarWithStatus
                 className="h-8 w-8"
-                src={otherUser?.avatar_url || undefined}
-                fallback={otherUser?.username?.charAt(0).toUpperCase() || ''}
-                status={otherUser?.status || 'offline'}
-                lastSeen={otherUser?.last_seen_at}
+                profileId={otherUser?.id || ''}
               />
               <span className="text-sm font-medium">{otherUser?.username || 'Unknown User'}</span>
             </Link>

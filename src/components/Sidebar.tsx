@@ -23,7 +23,6 @@ import { useRouter } from 'next/navigation'
 
 export function Sidebar() {
   const { logout, currentUser } = useAuth()
-  const [showChannelForm, setShowChannelForm] = useState(false)
   const router = useRouter()
 
   const handleSettingsClick = () => {
@@ -41,18 +40,6 @@ export function Sidebar() {
       <Separator />
       <ScrollArea className="flex-1">
         <div className="p-4">
-          <div className="flex justify-between items-center mb-2">
-            <h2 className="text-lg font-semibold">Channels</h2>
-            <Button variant="outline" size="sm" className="px-2" onClick={() => setShowChannelForm(!showChannelForm)}>
-              {showChannelForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-            </Button>
-          </div>
-          {showChannelForm && (
-            <ChannelCreationForm 
-              onClose={() => setShowChannelForm(false)} 
-            />
-          )}
-          {showChannelForm && <Separator className="my-4" />}
           <ChannelList />
           <Separator className="my-4" />
           <DirectMessageList />
@@ -69,10 +56,7 @@ export function Sidebar() {
             >
               <AvatarWithStatus
                 className="h-8 w-8"
-                src={currentUser?.avatar_url || undefined}
-                fallback={currentUser?.full_name?.charAt(0).toUpperCase() || ''}
-                status={currentUser?.status || 'offline'}
-                lastSeen={currentUser?.last_seen_at}
+                profileId={currentUser?.id || ''}
               />
               <div className="flex-1 text-left">
                 <p className="text-sm font-medium leading-none">{currentUser?.full_name}</p>

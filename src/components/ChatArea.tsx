@@ -17,11 +17,11 @@ export function ChatArea({ channelId }: ChatAreaProps) {
   const { currentUser } = useAuth();
   const { messages, sendMessage } = useMessages(channelId);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const { getChannel, getChannelMembers } = useChannels();
+  const { channels } = useChannels();
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
 
-  const channel = getChannel(channelId);
-  const members = getChannelMembers(channelId);
+  const channel = channels.data?.find(channel => channel.id === channelId);
+  const members = channel?.members;
 
   const handleScroll = () => {
     const scrollArea = document.querySelector('[data-radix-scroll-area-viewport]');
@@ -52,23 +52,23 @@ export function ChatArea({ channelId }: ChatAreaProps) {
   };
 
   const getOtherUser = () => {
-    if (!members.data) return null;
-    return members.data.find(member => member.profile_id !== currentUser?.id)?.profile;
+    if (!members) return null;
+    return members.find(member => member.profile_id !== currentUser?.id)?.profile;
   }
 
   const getCurrentUserRole = () => {
-    if (!members.data || !currentUser) return undefined;
-    const currentMember = members.data.find(member => member.profile_id === currentUser.id);
+    if (!members || !currentUser) return undefined;
+    const currentMember = members.find(member => member.profile_id === currentUser.id);
     return currentMember?.role;
   }
 
   const getLastReadAt = () => {
-    if (!members.data || !currentUser) return undefined;
-    const currentMember = members.data.find(member => member.profile_id === currentUser.id);
+    if (!members || !currentUser) return undefined;
+    const currentMember = members.find(member => member.profile_id === currentUser.id);
     return currentMember?.last_read_at;
   }
 
-  if (channel.isError || !channel.data) {
+  if (!channel) {
     return (
       <div className="flex items-center justify-center h-full text-muted-foreground">
         Channel not found
@@ -79,13 +79,13 @@ export function ChatArea({ channelId }: ChatAreaProps) {
   return (
     <div className="h-full flex flex-col">
       <ChatHeader 
-        channel={channel.data} 
+        channel={channel} 
         otherUser={getOtherUser()} 
         currentUserRole={getCurrentUserRole()}
       />
       <MessagesArea 
         messages={messages.data?.rootMessages}
-        isLoading={channel.isLoading || messages.isLoading}
+        isLoading={messages.isLoading}
         onReply={setReplyingTo}
         shouldAutoScroll={shouldAutoScroll}
         onScroll={handleScroll}

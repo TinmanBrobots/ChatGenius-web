@@ -39,15 +39,6 @@ export function ChatHeader({ channel, otherUser, currentUserRole }: ChatHeaderPr
               </Button>
             </SheetTrigger>
             <SheetContent>
-              <SheetHeader>
-                <SheetTitle className="flex gap-4 items-center">
-									Channel Files
-									<FileUploadDialog
-										channelId={channel.id}
-										onUploadComplete={() => setFileListShouldRefresh(true)}
-									/>
-								</SheetTitle>
-              </SheetHeader>
               <div className="mt-4">
                 <FileList 
                   channelId={channel.id} 
@@ -65,9 +56,6 @@ export function ChatHeader({ channel, otherUser, currentUserRole }: ChatHeaderPr
               </Button>
             </SheetTrigger>
             <SheetContent>
-              <SheetHeader>
-                <SheetTitle>Channel Members</SheetTitle>
-              </SheetHeader>
               <div className="mt-4">
                 <ChannelMembers channelId={channel.id} />
               </div>
