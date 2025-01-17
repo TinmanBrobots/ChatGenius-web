@@ -1,6 +1,6 @@
 "use client"
 
-import * as React from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Check, ChevronsUpDown, Loader2, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -33,6 +33,10 @@ interface ComboboxMultiProps {
   emptyText?: string
   loadingText?: string
   maxSelected?: number
+  startOpen?: boolean
+  excludeValues?: string[]
+  side?: "top" | "bottom" | "left" | "right"
+  initSelectedValues?: Record<string, string>
 }
 
 export function ComboboxMulti({
@@ -43,24 +47,29 @@ export function ComboboxMulti({
   emptyText = "No items found.",
   loadingText = "Loading...",
   maxSelected,
+  startOpen = false,
+  excludeValues = [],
+  side = "bottom",
+  initSelectedValues = {},
 }: ComboboxMultiProps) {
-  const [open, setOpen] = React.useState(false)
-  const [query, setQuery] = React.useState("")
-  const [options, setOptions] = React.useState<ComboboxOption[]>([])
-  const [loading, setLoading] = React.useState(false)
-  const [selectedLabels, setSelectedLabels] = React.useState<Record<string, string>>({})
+  const [open, setOpen] = useState(startOpen)
+  const [query, setQuery] = useState("")
+  const [options, setOptions] = useState<ComboboxOption[]>([])
+  const [loading, setLoading] = useState(false)
+  const [selectedLabels, setSelectedLabels] = useState<Record<string, string>>(initSelectedValues)
 
   // Debounced search
-  React.useEffect(() => {
+  useEffect(() => {
     const timer = setTimeout(async () => {
       if (query) {
         setLoading(true)
         try {
           const results = await onSearch(query)
-          setOptions(results)
+          const filteredResults = results.filter(option => !excludeValues.includes(option.value))
+          setOptions(filteredResults)
           // Update selected labels with any new options
           const newLabels = { ...selectedLabels }
-          results.forEach(option => {
+          filteredResults.forEach(option => {
             if (value.includes(option.value)) {
               newLabels[option.value] = option.label
             }
@@ -80,7 +89,7 @@ export function ComboboxMulti({
     return () => clearTimeout(timer)
   }, [query, onSearch])
 
-  const handleSelect = React.useCallback((optionValue: string, optionLabel: string) => {
+  const handleSelect = useCallback((optionValue: string, optionLabel: string) => {
     if (value.includes(optionValue)) {
       onChange(value.filter(v => v !== optionValue))
       const newLabels = { ...selectedLabels }
@@ -95,7 +104,7 @@ export function ComboboxMulti({
     }
   }, [value, onChange, maxSelected, selectedLabels])
 
-  const removeValue = React.useCallback((optionValue: string) => {
+  const removeValue = useCallback((optionValue: string) => {
     onChange(value.filter(v => v !== optionValue))
     const newLabels = { ...selectedLabels }
     delete newLabels[optionValue]
@@ -127,9 +136,10 @@ export function ComboboxMulti({
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+        <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" side={side}>
           <Command shouldFilter={false}>
             <CommandInput 
+              className="combobox-input"
               placeholder="Search..." 
               value={query}
               onValueChange={setQuery}
@@ -146,6 +156,7 @@ export function ComboboxMulti({
                 <CommandGroup>
                   {options.map((option) => (
                     <CommandItem
+                      className="combobox-option"
                       key={option.value}
                       value={option.value}
                       onSelect={() => handleSelect(option.value, option.label)}

@@ -9,6 +9,9 @@ interface SendMessageData {
   content: string;
   channel_id: string;
   parent_id?: string;
+  metadata?: {
+    mentioned_users?: string[];
+  };
 }
 
 // Helper function to create a message map structure

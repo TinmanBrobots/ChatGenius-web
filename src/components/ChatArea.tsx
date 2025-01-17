@@ -32,13 +32,16 @@ export function ChatArea({ channelId }: ChatAreaProps) {
     setShouldAutoScroll(isNearBottom);
   };
 
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = async (content: string, mentionedUsers?: string[]) => {
     try {
       setShouldAutoScroll(true);
       await sendMessage.mutateAsync({
         content,
         parent_id: replyingTo || undefined,
-        channel_id: channelId
+        channel_id: channelId,
+        metadata: {
+          mentioned_users: mentionedUsers || undefined
+        }
       });
       setReplyingTo(null);
     } catch (error) {

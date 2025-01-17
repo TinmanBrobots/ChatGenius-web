@@ -46,7 +46,7 @@ export default function RegisterPage() {
           <CardContent>
             <Alert>
               <AlertDescription>
-                We've sent a verification link to <strong>{email}</strong>. 
+                We&apos;ve sent a verification link to <strong>{email}</strong>. 
                 Please check your inbox and click the link to verify your account.
               </AlertDescription>
             </Alert>
